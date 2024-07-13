@@ -1,5 +1,7 @@
 import { connect } from "amqplib";
 import { getEnvironmentVariableOrFail } from "./environmentVariableHelp.js";
+import { orderSchema } from "./orderSchema.js";
+import { sendValueToMicrobit } from "./microbitSerial.js";
 
 async function main() {
     const exchangeURL = getEnvironmentVariableOrFail("AMQP_EXCHANGE_URL");
@@ -23,10 +25,18 @@ async function main() {
             log("Consumer cancelled by server (got null msg)");
             return;
         }
+
         const content = msg.content.toString();
-        //you would do processing here.
-        log(`Received and processed`, content);
-        channel.ack(msg);
+
+        const { error, value } = orderSchema.validate(JSON.parse(content));
+        if (error || !value) {
+            log(`Bad order message on queue: `, content, error);
+            channel.ack(msg);
+        } else {
+            log(`Received and processed order: `, value);
+            await sendValueToMicrobit(value.quantity);
+            channel.ack(msg);
+        }
     }
 }
 
