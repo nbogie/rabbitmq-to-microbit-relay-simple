@@ -13,14 +13,18 @@ const serialport = new SerialPort({
 console.log("serial port setup: ", serialport.settings);
 /**
  *
- * @param {*} num
+ * @param {string} str
  * @returns {Promise<void>} a promise which resolves once the value is completely sent to the microbit. (waits for drain)
  */
-export async function sendValueToMicrobit(num) {
+export async function sendStringToMicrobit(str) {
     const promiseToWriteAndDrain = new Promise((resolve) => {
-        console.log(`Tx: ${num} -> microbit`);
-        serialport.write(num + "\r\n");
-        serialport.drain(() => resolve);
+        console.log(`Tx: ${str} -> microbit at ${performance.now()}`);
+        const readyToContinue = serialport.write(str + "\r\n");
+        if (!readyToContinue) {
+            serialport.drain(resolve);
+        } else {
+            resolve();
+        }
     });
     await promiseToWriteAndDrain;
     //wait another 50ms
@@ -30,13 +34,24 @@ export async function sendValueToMicrobit(num) {
 
 export async function testSomeSends() {
     for (let i = 0; i < 10; i++) {
-        const num = Math.round(Math.random() * 255);
-        await sendValueToMicrobit(num);
+        const num = pick([130, 131, 132]);
+        await sendStringToMicrobit("21:" + num);
     }
 }
 
 function delay(timeInMillis) {
     return new Promise((resolve) => {
         setTimeout(resolve, timeInMillis);
+    });
+}
+
+function pick(arr) {
+    return arr[Math.floor(Math.random() * arr)];
+}
+
+export async function drainOutput() {
+    return new Promise((resolve) => {
+        console.log(`Draining out to microbit serial`);
+        serialport.drain(resolve);
     });
 }
