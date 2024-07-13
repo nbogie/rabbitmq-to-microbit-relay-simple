@@ -1,0 +1,28 @@
+{
+    "name": "rabbitmq-to-microbit-relay-simple",
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "nbogie",
+    "license": "MIT",
+    "scripts": {
+        "start": "node src/microbitMessageConsumer.js",
+        "start:dev": "nodemon src/microbitMessageConsumer.js --ext 'js'",
+        "test": "vitest --run",
+        "test:watch": "vitest --reporter=verbose",
+        "lint": "yarn eslint .",
+        "format": "yarn prettier --write .",
+        "format:check": "yarn prettier --check .",
+        "check-all": "yarn lint && yarn format:check && yarn test && echo 'All checks passed!'"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.7.0",
+        "eslint": "9.x",
+        "globals": "^15.8.0",
+        "nodemon": "^3.1.4",
+        "prettier": "^3.3.3"
+    },
+    "dependencies": {
+        "amqplib": "^0.10.4",
+        "serialport": "^12.0.0"
+    }
+}
