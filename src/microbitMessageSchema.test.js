@@ -24,7 +24,6 @@ test("extra random field not allowed", () => {
         from: "neill",
     };
     const result = microbitMessageSchema.safeParse(objectToValidate);
-    console.log(result, objectToValidate);
     expect(result.success).toBeFalsy();
     expect(result.error).toBeTypeOf("object");
     expect(result.error.message).toContain("unrecognized_keys");
