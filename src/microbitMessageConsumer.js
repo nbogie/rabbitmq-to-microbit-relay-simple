@@ -32,22 +32,21 @@ async function main() {
             log("Consumer cancelled by server (got null msg)");
             return;
         }
-
         const content = msg.content.toString();
-
-        const { error, value } = microbitMessageSchema.validate(
+        const { success, error, data } = microbitMessageSchema.safeParse(
             JSON.parse(content)
         );
-        if (error || !value) {
+
+        if (!success) {
             log(`Bad order message on queue: `, content, error);
             channel.ack(msg);
         } else {
-            log(`Received message: `, value);
-            if (value.servoValue !== undefined) {
-                await sendStringToMicrobit(35 + ":" + value.servoValue);
+            log(`Received message: `, data);
+            if (data.servoValue !== undefined) {
+                await sendStringToMicrobit(35 + ":" + data.servoValue);
             }
-            if (value.lightValue !== undefined) {
-                await sendStringToMicrobit(21 + ":" + value.lightValue);
+            if (data.lightValue !== undefined) {
+                await sendStringToMicrobit(21 + ":" + data.lightValue);
             }
             channel.ack(msg);
         }

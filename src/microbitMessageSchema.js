@@ -1,10 +1,9 @@
-import Joi from "joi";
-//docs are at https://joi.dev/api/
-
-export const microbitMessageSchema = Joi.object().keys({
-    type: Joi.string().valid("microbit").required(),
-    from: Joi.string().alphanum().min(1).max(20).required(),
-    lightPattern: Joi.string().alphanum().min(1).max(20),
-    lightValue: Joi.number().integer(),
-    servoValue: Joi.number().min(0).max(255),
+import { z } from "zod";
+//docs https://zod.dev/?id=basic-usage
+export const microbitMessageSchema = z.object({
+    type: z.literal("microbit"),
+    from: z.string().min(1).max(20),
+    lightPattern: z.string().min(1).max(20).optional(),
+    lightValue: z.number().int().optional(),
+    servoValue: z.number().min(0).max(255).optional(),
 });
